@@ -50,9 +50,7 @@
         position: fixed;
         inset: -20%;
         pointer-events: none;
-        background:
-          radial-gradient(circle at 18% 12%, rgba(124, 108, 255, 0.28), transparent 32%),
-          radial-gradient(circle at 88% 82%, rgba(94, 224, 192, 0.16), transparent 28%);
+        background: radial-gradient(circle at 18% 12%, rgba(124, 108, 255, 0.28), transparent 32%), radial-gradient(circle at 88% 82%, rgba(94, 224, 192, 0.16), transparent 28%);
       }
 
       .topbar,
@@ -167,9 +165,7 @@
       .placeholder {
         display: grid;
         place-items: center;
-        background:
-          radial-gradient(circle at 50% 35%, rgba(124, 108, 255, 0.22), transparent 42%),
-          linear-gradient(180deg, #151822, #0c0e14);
+        background: radial-gradient(circle at 50% 35%, rgba(124, 108, 255, 0.22), transparent 42%), linear-gradient(180deg, #151822, #0c0e14);
       }
 
       .placeholder.hidden {
@@ -376,8 +372,61 @@
       }
 
       .ctrl.call svg {
-        width: 26px;
-        height: 26px;
+        width: 36px;
+        height: 36px;
+        fill: currentColor;
+        stroke: none;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: call-wiggle 1.7s ease-in-out infinite;
+      }
+
+      .app.connecting .ctrl.call svg,
+      .app.live .ctrl.call svg,
+      .ctrl.call.end svg {
+        animation: none;
+      }
+
+      .ctrl.call.end svg {
+        transform: rotate(136deg);
+      }
+
+      @keyframes call-wiggle {
+        0%,
+        68%,
+        100% {
+          transform: rotate(0deg);
+        }
+        8% {
+          transform: rotate(18deg);
+        }
+        16% {
+          transform: rotate(-16deg);
+        }
+        24% {
+          transform: rotate(14deg);
+        }
+        32% {
+          transform: rotate(-12deg);
+        }
+        40% {
+          transform: rotate(8deg);
+        }
+        48% {
+          transform: rotate(-5deg);
+        }
+        56% {
+          transform: rotate(3deg);
+        }
+        62% {
+          transform: rotate(-1deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ctrl.call svg {
+          animation: none;
+        }
       }
     </style>
   </head>
@@ -403,10 +452,12 @@
         <video id="preview" class="preview" autoplay muted playsinline></video>
         <div id="placeholder" class="placeholder">
           <div class="cam-off-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 7.5h10.5A1.5 1.5 0 0 1 15 9v8.5A1.5 1.5 0 0 1 13.5 19H3.5A1.5 1.5 0 0 1 2 17.5V9A1.5 1.5 0 0 1 3.5 7.5H3" />
-              <path d="m15 11 6-3v10l-6-3" />
-              <path d="m3 4 18 16" />
+            <svg t="1794921154893" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6067" width="128" height="128">
+              <path
+                d="M12.49819 12.49819a42.662011 42.662011 0 0 1 60.338649 0L1011.503474 951.164825a42.662011 42.662011 0 0 1-60.338649 60.338649l-236.029847-236.029846a128.037232 128.037232 0 0 1-117.797325 77.861689H128.004336c-70.693755 0-127.998832-57.305077-127.998832-127.998832V298.665179c0-65.061806 48.549957-118.782916 111.397383-126.923642L12.49819 72.836839a42.662011 42.662011 0 0 1 0-60.338649zM195.664519 256.003168H128.004336a42.662011 42.662011 0 0 0-42.662011 42.662011v426.671306A42.662011 42.662011 0 0 0 128.004336 767.998496h469.333317A42.662011 42.662011 0 0 0 639.999664 725.336485v-24.998172L195.664519 256.003168z m401.660334-85.336821c70.706555 0 127.998832 57.305077 127.998832 127.998832v124.837261l4.46716 4.454359 226.532333-163.864105C984.53412 243.68968 1023.99616 263.849496 1023.99616 298.665179v426.671306a42.662011 42.662011 0 0 1-85.336821 0V382.184417L750.334657 518.413573a42.662011 42.662011 0 0 1-55.167496-4.403159l-42.674811-42.662011A42.662011 42.662011 0 0 1 639.999664 441.179078V298.665179A42.662011 42.662011 0 0 0 597.337653 256.003168H454.823754a42.662011 42.662011 0 0 1 0-85.336821h142.513899z"
+                fill="#aaaaaa"
+                p-id="6068"
+              ></path>
             </svg>
           </div>
         </div>
@@ -443,14 +494,26 @@
           </svg>
         </button>
         <button class="ctrl call" id="callBtn" type="button" aria-label="开始通话">
-          <svg viewBox="0 0 24 24" id="callIcon">
-            <path d="M6.5 9.5c3 6 8 8 8 8l2.6-2.6a1 1 0 0 1 1-.24l3.3.88a1 1 0 0 1 .74 1v3.16a1 1 0 0 1-1.1 1A17.5 17.5 0 0 1 4.3 5.96a1 1 0 0 1 1-1.1h3.16a1 1 0 0 1 1 .74l.88 3.3a1 1 0 0 1-.24 1z" />
+          <svg t="1794920536709" id="callIcon" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2832" width="36" height="36">
+            <path
+              d="M725.681633 902.791837c-38.661224 0-82.02449-7.314286-127.477551-21.420408-109.191837-33.959184-216.816327-105.012245-303.020409-200.09796C166.138776 538.644898 104.489796 396.538776 116.506122 270.106122c3.657143-31.346939 13.583673-71.053061 60.604082-102.922449 36.04898-29.257143 77.322449-45.97551 109.714286-45.453061 33.959184 0.522449 45.453061 12.538776 80.457143 63.216327 53.812245 74.187755 57.469388 110.759184 55.379591 131.657143-3.657143 34.481633-22.465306 49.632653-39.706122 63.216326-4.179592 3.134694-8.359184 6.791837-12.016326 9.926531-20.897959 26.644898-46.497959 63.738776 63.216326 177.110204 93.518367 89.861224 144.195918 100.832653 165.616327 99.265306 16.718367-1.044898 22.987755-9.926531 25.6-13.061225l0.522449-0.522448c35.004082-49.110204 46.497959-61.126531 79.934693-66.351021 32.391837-5.22449 49.110204 5.22449 118.07347 48.587755 62.171429 39.183673 90.906122 65.306122 84.636735 106.579592-2.089796 44.930612-36.571429 106.057143-75.232654 133.746939-26.644898 18.285714-63.738776 27.689796-107.624489 27.689796z"
+              fill="#ffffff"
+              p-id="2833"
+            ></path>
           </svg>
         </button>
         <button class="ctrl" id="camBtn" type="button" aria-label="关闭摄像头" title="开关摄像头">
-          <svg viewBox="0 0 24 24">
-            <path d="M3.5 8h11A1.5 1.5 0 0 1 16 9.5v7A1.5 1.5 0 0 1 14.5 18h-11A1.5 1.5 0 0 1 2 16.5v-7A1.5 1.5 0 0 1 3.5 8z" />
-            <path d="m16 11 5.2-2.4v8.8L16 15" />
+          <svg t="1794921072815" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4986" width="128" height="128">
+            <path
+              d="M907.712 642.592L905.088 340 700.832 485.056l206.88 157.536z m-39.68-354.784a64 64 0 0 1 101.056 51.648l2.624 302.592a64 64 0 0 1-102.752 51.456L662.048 535.968a64 64 0 0 1 1.728-103.104l204.256-145.056z"
+              p-id="4987"
+              fill="#ffffff"
+            ></path>
+            <path
+              d="M144 256a32 32 0 0 0-32 32v417.376a32 32 0 0 0 32 32h456.32a32 32 0 0 0 32-32V288a32 32 0 0 0-32-32H144z m0-64h456.32a96 96 0 0 1 96 96v417.376a96 96 0 0 1-96 96H144a96 96 0 0 1-96-96V288a96 96 0 0 1 96-96z"
+              p-id="4988"
+              fill="#ffffff"
+            ></path>
           </svg>
         </button>
       </nav>
@@ -556,9 +619,6 @@
       function setCallButton(inCall) {
         callBtn.classList.toggle("end", inCall);
         callBtn.setAttribute("aria-label", inCall ? "结束通话" : "开始通话");
-        callBtn.innerHTML = inCall
-          ? '<svg viewBox="0 0 24 24"><path d="M6.5 9.5c3 6 8 8 8 8l2.6-2.6a1 1 0 0 1 1-.24l3.3.88a1 1 0 0 1 .74 1v3.16a1 1 0 0 1-1.1 1A17.5 17.5 0 0 1 4.3 5.96a1 1 0 0 1 1-1.1h3.16a1 1 0 0 1 1 .74l.88 3.3a1 1 0 0 1-.24 1z"/><path d="M4 4l16 16"/></svg>'
-          : '<svg viewBox="0 0 24 24"><path d="M6.5 9.5c3 6 8 8 8 8l2.6-2.6a1 1 0 0 1 1-.24l3.3.88a1 1 0 0 1 .74 1v3.16a1 1 0 0 1-1.1 1A17.5 17.5 0 0 1 4.3 5.96a1 1 0 0 1 1-1.1h3.16a1 1 0 0 1 1 .74l.88 3.3a1 1 0 0 1-.24 1z"/></svg>';
       }
 
       async function requestWakeLock() {
@@ -894,10 +954,13 @@
           setAiSpeaking(true);
           aiStateEl.textContent = "正在说话";
           if (speakingTimer) clearTimeout(speakingTimer);
-          speakingTimer = setTimeout(() => {
-            setAiSpeaking(false);
-            if (connected) aiStateEl.textContent = "正在听";
-          }, Math.max(0, (nextPlayTime - outputContext.currentTime) * 1000) + 120);
+          speakingTimer = setTimeout(
+            () => {
+              setAiSpeaking(false);
+              if (connected) aiStateEl.textContent = "正在听";
+            },
+            Math.max(0, (nextPlayTime - outputContext.currentTime) * 1000) + 120,
+          );
         } catch (error) {
           activeAudioSources.delete(source);
           console.error("[AUDIO] play failed:", error);
