@@ -768,7 +768,7 @@
       }
 
       async function playPCM(base64) {
-        if (!base64) return;
+        if (!connected || !base64) return;
         if (!outputContext) outputContext = new AudioContext();
         if (outputContext.state === "suspended") {
           try {
@@ -819,11 +819,13 @@
           speakingTimer = null;
         }
         nextPlayTime = outputContext ? outputContext.currentTime : 0;
+        aiStateEl.textContent = connected ? "正在听" : "Gemini";
       }
 
       async function handleGeminiMessage(event) {
+        if (!connected || (ws && event.target !== ws)) return;
         const text = await websocketDataToText(event.data);
-        if (!text) return;
+        if (!connected || !text) return;
         let message;
         try {
           message = JSON.parse(text);
@@ -932,20 +934,7 @@
         ws.onmessage = handleGeminiMessage;
         ws.onerror = () => setStatus("WebSocket 出错");
         ws.onclose = () => {
-          connected = false;
-          connecting = false;
-          setupComplete = false;
-          callBtn.disabled = false;
-          setCallButton(false);
-          setAppState();
-          badgeEl.textContent = "离线";
-          aiStateEl.textContent = "Gemini";
-          stopMicrophoneGraph(false);
-          stopFrameLoop();
-          stopAudioPlayback();
-          stopOrbVisual();
-          releaseWakeLock();
-          setStatus(manualClosing ? "通话已结束" : "连接中断，请重新开始");
+          finishCall(manualClosing ? "通话已结束" : "连接中断，请重新开始");
         };
       }
 
@@ -966,9 +955,12 @@
         connect();
       }
 
-      function endCall() {
-        manualClosing = true;
-        stopMicrophoneGraph(true);
+      function finishCall(statusText) {
+        connected = false;
+        connecting = false;
+        setupComplete = false;
+        talking = false;
+        stopMicrophoneGraph(false);
         stopFrameLoop();
         stopAudioPlayback();
         stopOrbVisual();
@@ -976,13 +968,29 @@
         audioStream = null;
         stopVideo();
         releaseWakeLock();
-        if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-          ws.close(1000, "Call ended");
-        }
         userTranscript = "";
         aiTranscript = "";
         setCaption(aiCaptionEl, "");
         setCaption(userCaptionEl, "");
+        callBtn.disabled = false;
+        setCallButton(false);
+        setAppState();
+        badgeEl.textContent = "离线";
+        aiStateEl.textContent = "Gemini";
+        setStatus(statusText);
+      }
+
+      function endCall() {
+        manualClosing = true;
+        const socket = ws;
+        ws = null;
+        if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+          try {
+            socket.close(1000, "Call ended");
+          } catch (_) {}
+        }
+        // 不要等 onclose：代理卡住时界面会一直停在「正在结束通话 / 正在听」
+        finishCall("通话已结束");
       }
 
       callBtn.addEventListener("click", async () => {
