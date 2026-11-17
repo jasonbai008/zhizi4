@@ -222,6 +222,33 @@
         display: block;
       }
 
+      .voice-bars {
+        position: absolute;
+        inset: 22%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+
+      .voice-bars span {
+        width: 5px;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--accent);
+        transform: scaleY(var(--s, 0.4));
+        transform-origin: center;
+        will-change: transform;
+      }
+
+      .ai-card.speaking .robot-lottie {
+        display: none;
+      }
+
+      .ai-card.speaking .voice-bars {
+        display: flex;
+      }
+
       .ai-card small {
         display: block;
         margin-top: 8px;
@@ -387,6 +414,16 @@
         <aside class="ai-card">
           <div class="orb" aria-hidden="true">
             <div id="robotLottie" class="robot-lottie"></div>
+            <div id="voiceBars" class="voice-bars">
+              <span style="--s: 0.42"></span>
+              <span style="--s: 0.68"></span>
+              <span style="--s: 0.32"></span>
+              <span style="--s: 0.88"></span>
+              <span style="--s: 0.5"></span>
+              <span style="--s: 1"></span>
+              <span style="--s: 0.46"></span>
+              <span style="--s: 0.7"></span>
+            </div>
           </div>
           <small id="aiState">智子 4.0</small>
         </aside>
@@ -442,6 +479,8 @@
       const placeholderEl = document.getElementById("placeholder");
       const statusEl = document.getElementById("status");
       const badgeEl = document.getElementById("badge");
+      const aiCardEl = document.querySelector(".ai-card");
+      const voiceBarEls = [...document.querySelectorAll("#voiceBars span")];
       const aiStateEl = document.getElementById("aiState");
       const aiCaptionEl = document.getElementById("aiCaption");
       const userCaptionEl = document.getElementById("userCaption");
@@ -468,7 +507,20 @@
       let silentGain = null;
       let outputAnalyser = null;
       let outputAnalyserBytes = null;
+      let outputFreqBytes = null;
       let orbRaf = 0;
+      let aiSpeaking = false;
+      const VOICE_BAR_IDLE = [0.42, 0.68, 0.32, 0.88, 0.5, 1, 0.46, 0.7];
+      const VOICE_BAR_BANDS = [
+        [1, 3],
+        [3, 6],
+        [6, 10],
+        [10, 16],
+        [16, 24],
+        [24, 34],
+        [34, 48],
+        [48, 72],
+      ];
       const activeAudioSources = new Set();
       let nextPlayTime = 0;
       let speakingTimer = null;
@@ -753,9 +805,22 @@
           outputAnalyser.fftSize = 512;
           outputAnalyser.smoothingTimeConstant = 0.22;
           outputAnalyserBytes = new Uint8Array(outputAnalyser.fftSize);
+          outputFreqBytes = new Uint8Array(outputAnalyser.frequencyBinCount);
           outputAnalyser.connect(outputContext.destination);
         }
         return outputAnalyser;
+      }
+
+      function setVoiceBars(scales) {
+        for (let i = 0; i < voiceBarEls.length; i++) {
+          voiceBarEls[i].style.setProperty("--s", String(scales[i] ?? VOICE_BAR_IDLE[i]));
+        }
+      }
+
+      function setAiSpeaking(on) {
+        aiSpeaking = on;
+        aiCardEl.classList.toggle("speaking", on);
+        if (!on) setVoiceBars(VOICE_BAR_IDLE);
       }
 
       function startOrbVisual() {
@@ -772,6 +837,22 @@
             level = Math.min(1, Math.sqrt(sum / outputAnalyserBytes.length) * 4);
           }
           document.documentElement.style.setProperty("--level", String(level));
+          if (aiSpeaking && outputAnalyser && outputFreqBytes) {
+            outputAnalyser.getByteFrequencyData(outputFreqBytes);
+            const scales = VOICE_BAR_BANDS.map((band, index) => {
+              const [from, to] = band;
+              let total = 0;
+              let count = 0;
+              for (let i = from; i < to && i < outputFreqBytes.length; i++) {
+                total += outputFreqBytes[i];
+                count++;
+              }
+              const energy = count ? total / count / 255 : 0;
+              const mixed = Math.min(1, energy * 1.55 + level * 0.35);
+              return Math.max(0.18, VOICE_BAR_IDLE[index] * (0.28 + mixed * 0.92));
+            });
+            setVoiceBars(scales);
+          }
           orbRaf = requestAnimationFrame(tick);
         };
         orbRaf = requestAnimationFrame(tick);
@@ -781,6 +862,7 @@
         if (orbRaf) cancelAnimationFrame(orbRaf);
         orbRaf = 0;
         document.documentElement.style.setProperty("--level", "0");
+        setAiSpeaking(false);
       }
 
       async function playPCM(base64) {
@@ -809,9 +891,11 @@
           source.start(nextPlayTime);
           nextPlayTime += audioBuffer.duration;
           startOrbVisual();
+          setAiSpeaking(true);
           aiStateEl.textContent = "正在说话";
           if (speakingTimer) clearTimeout(speakingTimer);
           speakingTimer = setTimeout(() => {
+            setAiSpeaking(false);
             if (connected) aiStateEl.textContent = "正在听";
           }, Math.max(0, (nextPlayTime - outputContext.currentTime) * 1000) + 120);
         } catch (error) {
@@ -835,6 +919,7 @@
           speakingTimer = null;
         }
         nextPlayTime = outputContext ? outputContext.currentTime : 0;
+        setAiSpeaking(false);
         aiStateEl.textContent = connected ? "正在听" : "智子 4.0";
       }
 
