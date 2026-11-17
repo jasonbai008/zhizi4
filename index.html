@@ -195,9 +195,9 @@
         padding: 10px 10px 12px;
         border-radius: 20px;
         border: 1px solid var(--line);
-        background: rgba(10, 12, 18, 0.72);
-        backdrop-filter: blur(18px);
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
       }
 
       .orb {
@@ -206,18 +206,20 @@
         aspect-ratio: 1;
         border-radius: 18px;
         overflow: hidden;
-        background: #0b0d14;
+        background: transparent;
       }
 
-      .orb::before {
-        content: "";
-        position: absolute;
-        inset: 18%;
-        border-radius: 50%;
-        background: radial-gradient(circle at 35% 30%, #fff, #9ae7ff 18%, #7c6cff 48%, #26183f 78%);
-        transform: scale(calc(0.92 + var(--level) * 0.22));
-        filter: blur(0.2px);
-        box-shadow: 0 0 calc(18px + var(--level) * 28px) rgba(124, 108, 255, 0.45);
+      .robot-lottie {
+        width: 100%;
+        height: 100%;
+        transform: scale(calc(0.92 + var(--level) * 0.18));
+        transform-origin: center center;
+      }
+
+      .robot-lottie svg {
+        width: 100%;
+        height: 100%;
+        display: block;
       }
 
       .ai-card small {
@@ -334,7 +336,9 @@
         font-size: 12px;
       }
 
-      svg {
+      .mark svg,
+      .cam-off-icon svg,
+      .ctrl svg {
         width: 22px;
         height: 22px;
         fill: none;
@@ -381,7 +385,9 @@
         </div>
         <div class="status" id="status">点下方按钮开始视频通话</div>
         <aside class="ai-card">
-          <div class="orb" aria-hidden="true"></div>
+          <div class="orb" aria-hidden="true">
+            <div id="robotLottie" class="robot-lottie"></div>
+          </div>
           <small id="aiState">智子 4.0</small>
         </aside>
         <div class="captions">
@@ -413,6 +419,7 @@
       </nav>
     </main>
 
+    <script src="lottie.min.js"></script>
     <script>
       "use strict";
 
@@ -421,6 +428,14 @@
       const FRAME_MS = 1000;
       const FRAME_MAX = 768;
       const JPEG_QUALITY = 0.72;
+
+      lottie.loadAnimation({
+        container: document.getElementById("robotLottie"),
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: "robot.json",
+      });
 
       const appEl = document.getElementById("app");
       const previewEl = document.getElementById("preview");
