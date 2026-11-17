@@ -362,7 +362,7 @@
           </div>
           <div class="brand-copy">
             <strong>Gemini Live</strong>
-            <span>3.8 · 视频通话</span>
+            <span>AI · 视频聊天</span>
           </div>
         </div>
         <div class="pill"><span class="dot"></span><span id="badge">离线</span></div>
@@ -382,7 +382,7 @@
         <div class="status" id="status">点下方按钮开始视频通话</div>
         <aside class="ai-card">
           <div class="orb" aria-hidden="true"></div>
-          <small id="aiState">Gemini</small>
+          <small id="aiState">智子 4.0</small>
         </aside>
         <div class="captions">
           <div class="caption ai" id="aiCaption"></div>
@@ -393,9 +393,10 @@
       <nav class="dock">
         <button class="ctrl" id="flipBtn" type="button" aria-label="切换摄像头" title="切换前后摄像头">
           <svg viewBox="0 0 24 24">
-            <path d="M7 8h10l-2-2" />
-            <path d="M17 16H7l2 2" />
-            <circle cx="12" cy="12" r="8.5" />
+            <path d="M20 11.2A8 8 0 0 0 6.4 7.2" />
+            <path d="M5.6 3.6v4h4" />
+            <path d="M4 12.8A8 8 0 0 0 17.6 16.8" />
+            <path d="M18.4 20.4v-4h-4" />
           </svg>
         </button>
         <button class="ctrl call" id="callBtn" type="button" aria-label="开始通话">
@@ -819,7 +820,7 @@
           speakingTimer = null;
         }
         nextPlayTime = outputContext ? outputContext.currentTime : 0;
-        aiStateEl.textContent = connected ? "正在听" : "Gemini";
+        aiStateEl.textContent = connected ? "正在听" : "智子 4.0";
       }
 
       async function handleGeminiMessage(event) {
@@ -976,7 +977,7 @@
         setCallButton(false);
         setAppState();
         badgeEl.textContent = "离线";
-        aiStateEl.textContent = "Gemini";
+        aiStateEl.textContent = "智子 4.0";
         setStatus(statusText);
       }
 
